@@ -37,6 +37,7 @@ jobs:
       # 使用後に新しいリフレッシュトークンをSecretに自動保存する
       - name: リフレッシュトークンを更新
         if: steps.generate.outputs.new_refresh_token != ''
+        continue-on-error: true   # Secrets権限がなくても後続ステップを止めない
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
