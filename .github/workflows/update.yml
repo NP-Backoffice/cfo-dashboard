@@ -1,0 +1,43 @@
+name: CFOダッシュボード更新
+
+on:
+  # 毎日 09:00 JST (= UTC 00:00) に自動実行
+  schedule:
+    - cron: '0 0 * * *'
+
+  # ブラウザの「データ更新」ボタンから手動トリガー
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: freeeデータ取得 & ダッシュボード生成
+        env:
+          FREEE_CLIENT_ID:     ${{ secrets.FREEE_CLIENT_ID }}
+          FREEE_CLIENT_SECRET: ${{ secrets.FREEE_CLIENT_SECRET }}
+          FREEE_REFRESH_TOKEN: ${{ secrets.FREEE_REFRESH_TOKEN }}
+          DASHBOARD_PASSWORD:  ${{ secrets.DASHBOARD_PASSWORD }}
+          GH_PAT:              ${{ secrets.GH_PAT }}
+        run: node generate.js
+
+      - name: index.html をコミット & プッシュ
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --staged --quiet \
+            && echo "変更なし — スキップ" \
+            || (git commit -m "📊 ダッシュボード自動更新 $(TZ='Asia/Tokyo' date '+%Y-%m-%d %H:%M JST')" \
+                && git push)
