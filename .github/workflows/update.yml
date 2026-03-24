@@ -24,6 +24,7 @@ jobs:
           node-version: '20'
 
       - name: freeeデータ取得 & ダッシュボード生成
+        id: generate
         env:
           FREEE_CLIENT_ID:     ${{ secrets.FREEE_CLIENT_ID }}
           FREEE_CLIENT_SECRET: ${{ secrets.FREEE_CLIENT_SECRET }}
@@ -31,6 +32,17 @@ jobs:
           DASHBOARD_PASSWORD:  ${{ secrets.DASHBOARD_PASSWORD }}
           GH_PAT:              ${{ secrets.GH_PAT }}
         run: node generate.js
+
+      # freeeはトークンローテーション方式のため、
+      # 使用後に新しいリフレッシュトークンをSecretに自動保存する
+      - name: リフレッシュトークンを更新
+        if: steps.generate.outputs.new_refresh_token != ''
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          echo "${{ steps.generate.outputs.new_refresh_token }}" \
+            | gh secret set FREEE_REFRESH_TOKEN --repo NP-Backoffice/cfo-dashboard
+          echo "✓ FREEE_REFRESH_TOKEN を更新しました"
 
       - name: index.html をコミット & プッシュ
         run: |

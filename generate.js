@@ -57,6 +57,14 @@ async function getToken() {
   if (r.status !== 200)
     throw new Error(`トークン取得失敗 ${r.status}: ${JSON.stringify(r.body)}`);
   console.log('[freee] ✓ アクセストークン取得');
+
+  // ローテーション後の新しいリフレッシュトークンを GitHub Actions に渡す
+  if (r.body.refresh_token && process.env.GITHUB_OUTPUT) {
+    const line = `new_refresh_token=${r.body.refresh_token}\n`;
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, line);
+    console.log('[freee] ✓ 新リフレッシュトークンを出力');
+  }
+
   return r.body.access_token;
 }
 
