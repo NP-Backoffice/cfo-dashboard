@@ -637,16 +637,16 @@ function renderInsights() {
   if (revTrend !== null) {
     const up = revTrend > 0;
     insights.push({ level: up ? 'mid' : 'high', tag: up ? '● 売上成長' : '● 売上低下',
-      body: `直近${period}ヶ月で売上が<strong>${Math.abs(revTrend)}%${up?'増加':'減少'}</strong>。` +
-        (up ? `成長モメンタムを維持しつつ利益率${pct(cur.opMargin)}の水準管理が重要。` :
-              `要因分析と新規パイプライン強化が急務。現預金Runwayを確認しキャッシュ管理を徹底すること。`) });
+      body: '直近'+period+'ヶ月で売上が<strong>'+Math.abs(revTrend)+'%'+(up?'増加':'減少')+'</strong>。' +
+        (up ? '成長モメンタムを維持しつつ利益率'+pct(cur.opMargin)+'の水準管理が重要。'
+            : '要因分析と新規パイプライン強化が急務。現預金Runwayを確認しキャッシュ管理を徹底すること。') });
   }
 
   // Client concentration
   if (top2pct !== null) {
     const risk = parseFloat(top2pct) >= 50;
     insights.push({ level: risk ? 'high' : 'mid', tag: '● 売上集中リスク',
-      body: `上位2社（${clients[0]?.[0]}・${clients[1]?.[0]}）で${period}ヶ月売上の<strong>${top2pct}%</strong>を占有。` +
+      body: '上位2社（'+(clients[0]?.[0])+'・'+(clients[1]?.[0])+'）で'+period+'ヶ月売上の<strong>'+top2pct+'%</strong>を占有。' +
         (risk ? '解約・単価変動でキャッシュに直撃。新規獲得と既存深耕を並行して推進すること。' :
                 '集中度は許容範囲内。引き続きポートフォリオ分散を意識した営業活動を。') });
   }
@@ -656,12 +656,12 @@ function renderInsights() {
   if (bgtMargin > 0) {
     const diff = cur.opMargin - bgtMargin;
     insights.push({ level: diff >= 0 ? 'low' : 'high', tag: diff >= 0 ? '● 利益率達成' : '● 利益率未達',
-      body: `目標利益率${pct(bgtMargin)}に対して実績<strong>${pct(cur.opMargin)}</strong>（差 ${diff>=0?'+':''}${pct(diff)}）。` +
+      body: '目標利益率'+pct(bgtMargin)+'に対して実績<strong>'+pct(cur.opMargin)+'</strong>（差 '+(diff>=0?'+':'')+pct(diff)+'）。' +
         (diff >= 0 ? '外注費コントロールを維持し、この水準を堅守すること。' :
                      '外注費${outsourcePct}%が主因。案件単価の見直しと内製比率引き上げを検討。') });
   } else {
     insights.push({ level: 'low', tag: '● コスト構造',
-      body: `外注費が売上の<strong>${outsourcePct}%</strong>を占め変動費型コスト構造。売上増に連動して利益が出やすい一方、粗利改善には単価交渉か内製化が有効。` });
+      body: '外注費が売上の<strong>'+outsourcePct+'%</strong>を占め変動費型コスト構造。売上増に連動して利益が出やすい一方、粗利改善には単価交渉か内製化が有効。' });
   }
 
   document.getElementById('insightGrid').innerHTML = insights.map(i =>
