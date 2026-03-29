@@ -383,7 +383,7 @@ tr:hover td{background:var(--g1)}
 <div id="toast"></div>
 
 <script>
-const D = ${json};
+window._DD = ${json};
 const _PAT  = '${GH_PAT}';
 const _REPO = '${GH_REPO}';
 
@@ -404,9 +404,9 @@ function setPeriod(n) {
   renderAll();
 }
 
-function getSlice() { return D.months.slice(-period); }
-function getCurrent() { return D.months[D.months.length - 1]; }
-function getPrev() { return D.months[D.months.length - 2] || null; }
+function getSlice() { return _DD.months.slice(-period); }
+function getCurrent() { return _DD.months[_DD.months.length - 1]; }
+function getPrev() { return _DD.months[_DD.months.length - 2] || null; }
 
 // ── Budget ─────────────────────────────────────────────────────
 function getBudget() {
@@ -463,7 +463,7 @@ function renderKPIs() {
   }
 
   // Cash
-  const bs = D.bs;
+  const bs = _DD.bs;
   const runway = (bs.opex6mAvg > 0) ? Math.round((bs.cash + bs.bank) / bs.opex6mAvg * 10) / 10 : null;
   document.getElementById('kv2').textContent = yenM(bs.cash + bs.bank);
   document.getElementById('ks2').textContent = '現金 '+yen(bs.cash)+' / 銀行 '+yen(bs.bank);
@@ -546,7 +546,7 @@ function renderPL() {
 
 // ── B/S ───────────────────────────────────────────────────────
 function renderBS() {
-  const bs = D.bs;
+  const bs = _DD.bs;
   const eq = bs.totalAssets > 0 ? (bs.netAssets / bs.totalAssets * 100).toFixed(1) : '0.0';
   const cr = bs.currentLiab > 0 ? ((bs.cash+bs.bank) / bs.currentLiab * 100).toFixed(1) : '—';
   document.getElementById('bsGrid').innerHTML = [
@@ -602,7 +602,7 @@ function renderClients() {
 
 // ── Expenses ───────────────────────────────────────────────────
 function renderExpenses() {
-  const uns = D.unsettled;
+  const uns = _DD.unsettled;
   const total = uns.reduce((s,d)=>s+d.amount,0);
   document.getElementById('expBadge').textContent = total > 0 ? yen(total) : '精算済';
   document.getElementById('expCount').textContent = '合計 '+uns.length+'件 — 月末精算期限';
@@ -713,8 +713,8 @@ async function triggerUpdate() {
 }
 
 // ── Init ───────────────────────────────────────────────────────
-document.getElementById('updTime').textContent = '更新: ' + D.updatedAt;
-document.getElementById('ftr').textContent = 'NOWPEAK — FREEE API — GITHUB ACTIONS — ' + D.updatedAt;
+document.getElementById('updTime').textContent = '更新: ' + _DD.updatedAt;
+document.getElementById('ftr').textContent = 'NOWPEAK — FREEE API — GITHUB ACTIONS — ' + _DD.updatedAt;
 renderAll();
 <` + `/script>
 </body>
