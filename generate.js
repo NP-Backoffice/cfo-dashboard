@@ -67,7 +67,8 @@ function getMonths(jst, n) {
     const mo = d.getUTCMonth() + 1;
     const fy = mo >= 4 ? yr : yr - 1;
     const key = `${yr}/${String(mo).padStart(2, '0')}`;
-    months.push({ yr, mo, fy, key, label: `${mo}月`, dateStr: `${yr}-${String(mo).padStart(2,'0')}-01` });
+    const fm = ((mo - 4 + 12) % 12) + 1; // fiscal month (April=1 … March=12)
+    months.push({ yr, mo, fm, fy, key, label: mo + '月', dateStr: yr + '-' + String(mo).padStart(2, '0') + '-01' });
   }
   return months;
 }
@@ -658,7 +659,7 @@ function renderInsights() {
     insights.push({ level: diff >= 0 ? 'low' : 'high', tag: diff >= 0 ? '● 利益率達成' : '● 利益率未達',
       body: '目標利益率'+pct(bgtMargin)+'に対して実績<strong>'+pct(cur.opMargin)+'</strong>（差 '+(diff>=0?'+':'')+pct(diff)+'）。' +
         (diff >= 0 ? '外注費コントロールを維持し、この水準を堅守すること。' :
-                     '外注費${outsourcePct}%が主因。案件単価の見直しと内製比率引き上げを検討。') });
+                     '外注費'+outsourcePct+'%が主因。案件単価の見直しと内製比率引き上げを検討。') });
   } else {
     insights.push({ level: 'low', tag: '● コスト構造',
       body: '外注費が売上の<strong>'+outsourcePct+'%</strong>を占め変動費型コスト構造。売上増に連動して利益が出やすい一方、粗利改善には単価交渉か内製化が有効。' });
@@ -810,7 +811,7 @@ async function main() {
 
   // 6ヶ月分のP/Lを並列取得
   const plResults = await Promise.all(months6.map(m =>
-    freeeGet(token, '/reports/trial_pl', { fiscal_year: m.fy, start_month: m.mo, end_month: m.mo })
+    freeeGet(token, '/reports/trial_pl', { fiscal_year: m.fy, start_month: m.fm, end_month: m.fm })
   ));
 
   // 6ヶ月分のdeals + BSを並列取得
